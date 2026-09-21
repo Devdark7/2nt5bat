@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wolf City ERLC | انتخابات السيرفر</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style> 
+    body { font-family: 'Cairo', sans-serif; }
+    .signature-font { font-family: 'Poppins', sans-serif; }
+    
+    /* Animations & Dynamic Effects */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 22px rgba(59, 130, 246, 0.7);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .card-hover {
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 20px 30px -10px rgba(59, 130, 246, 0.25);
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+    
+    .logo-container {
+      animation: logoPulse 3s infinite ease-in-out;
+      transition: transform 0.3s ease;
+    }
+    .logo-container:hover {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .modal-animate {
+      animation: fadeInScale 0.25s ease-out forwards;
+    }
+    
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+  <!-- الإعلان العلوي -->
+  <div id="top-ad-display" class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white text-xs md:text-sm py-2.5 px-4 text-center font-semibold shadow-md border-b border-blue-500/30">
+    📢 [إعلان]: انضموا لسيرفر الديسكورد الخاص بنا Wolf City ERLC!
+  </div>
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-[#1e293b]/70 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3.5">
+        <!-- اللوجو المدمج المباشر بالسيرفر -->
+        <div class="logo-container w-12 h-12 rounded-xl bg-slate-900 border border-blue-500/50 p-1 flex items-center justify-center overflow-hidden shadow-lg">
+          <svg viewBox="0 0 500 500" class="w-full h-full object-contain">
+            <rect width="100%" height="100%" fill="#1e293b" rx="40"/>
+            <path d="M120 100 L250 380 L200 240 Z" fill="#0f172a" stroke="#ffffff" stroke-width="12" stroke-linejoin="round"/>
+            <path d="M380 100 L250 380 L300 240 Z" fill="#0f172a" stroke="#ffffff" stroke-width="12" stroke-linejoin="round"/>
+            <path d="M250 100 L350 220 L250 300 L150 220 Z" fill="none" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"/>
+            <text x="250" y="430" text-anchor="middle" fill="#ffffff" font-family="'Cairo', sans-serif" font-weight="900" font-size="32" letter-spacing="2">WOLF CITY</text>
+            <text x="250" y="465" text-anchor="middle" fill="#60a5fa" font-family="'Cairo', sans-serif" font-weight="700" font-size="22" letter-spacing="4">ER:LC</text>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold leading-none tracking-wide text-white flex items-center gap-2">
+            Wolf City ERLC
+          </h1>
+          <span class="text-xs text-blue-400 font-medium">نظام الانتخابات الرسمي</span>
+        </div>
+      </div>
+      
+      <button onclick="openAdminModal()" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 px-4 py-2.5 rounded-xl transition duration-200 font-semibold flex items-center gap-2 shadow-md hover:border-blue-500/50 active:scale-95">
+        🔒 لوحة التحكم
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full">
+
+    <!-- عداد الوقت مع أنيميشن الدخول -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 animate-fade-in">
+      <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 text-center shadow-lg backdrop-blur-md card-hover relative overflow-hidden group">
+        <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition duration-500"></div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">⏳ موعد افتتاح الانتخابات</h3>
+        <div id="open-timer" class="text-2xl md:text-3xl font-black text-blue-400 tracking-wider">-- : -- : -- : --</div>
+      </div>
+
+      <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 text-center shadow-lg backdrop-blur-md card-hover relative overflow-hidden group">
+        <div class="absolute -right-8 -top-8 w-24 h-24 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition duration-500"></div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">🛑 موعد إغلاق الانتخابات</h3>
+        <div id="close-timer" class="text-2xl md:text-3xl font-black text-rose-400 tracking-wider">-- : -- : -- : --</div>
+      </div>
+    </section>
+
+    <!-- حالة تصويت المستخدم -->
+    <div id="user-vote-status" class="hidden max-w-md mx-auto mb-8 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs text-center py-3 px-4 rounded-xl font-bold shadow-sm animate-pulse">
+      ✅ لقد قمت بالتصويت بالفعل.
+    </div>
+
+    <!-- قائمة المرشحين -->
+    <section class="animate-fade-in" style="animation-delay: 0.15s;">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-black text-white mb-2">المرشحون المتاحون</h2>
+        <p class="text-slate-400 text-xs md:text-sm">اختر مرشحاً واحداً فقط واضغط على زر تصويت</p>
+      </div>
+
+      <div id="candidates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- يتم عرض المرشحين هنا ديناميكياً -->
+      </div>
+    </section>
+  </main>
+
+  <!-- لوحة التحكم (Admin Panel Window) -->
+  <div id="adminModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-slate-800 border border-slate-700/80 rounded-2xl max-w-2xl w-full p-6 shadow-2xl my-8 relative overflow-hidden modal-animate">
+      
+      <!-- خلفية جمالية -->
+      <div class="absolute -top-16 -left-16 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Header النافذة مع زر الإغلاق X -->
+      <div class="flex justify-between items-center mb-6 border-b border-slate-700/80 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">🔒 لوحة تحكم Wolf City</h3>
+          <span class="text-[11px] signature-font tracking-wider bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-bold">
+            Developed By: Dark Wilz
+          </span>
+        </div>
+        <!-- زر الخروج X -->
+        <button onclick="closeAdminModal()" class="w-9 h-9 rounded-xl bg-slate-700/60 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center font-bold text-base transition duration-200 border border-slate-600/50 hover:border-rose-500 shadow-md">
+          ✕
+        </button>
+      </div>
+
+      <!-- تسجيل الدخول -->
+      <div id="adminLoginSection">
+        <p class="text-slate-400 text-xs mb-3">أدخل كلمة المرور الخاصة بالإدارة للدخول:</p>
+        <input type="password" id="adminPassword" placeholder="كلمة المرور..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:border-blue-500 text-sm transition">
+        <button onclick="checkAdminPassword()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-sm transition shadow-lg active:scale-95">دخول</button>
+      </div>
+
+      <!-- أدوات التعديل -->
+      <div id="adminControlSection" class="hidden space-y-6">
+        <div class="flex flex-wrap gap-2 justify-between items-center border-b border-slate-700/80 pb-3">
+          <span class="text-emerald-400 text-xs font-bold">✅ تم تسجيل الدخول بنجاح!</span>
+          <button onclick="resetAllVotes()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm">
+            🔄 تصفير الأصوات والسماح بالتصويت من جديد
+          </button>
+        </div>
+
+        <!-- 1. تعديل الإعلانات -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80">
+          <h4 class="font-bold text-xs text-blue-400 mb-2.5">📢 تعديل الإعلانات</h4>
+          <label class="text-[11px] text-slate-400 block mb-1">نص الإعلان العلوي:</label>
+          <input type="text" id="topAdInput" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2.5 rounded-lg mb-2.5 focus:outline-none focus:border-blue-500">
+          
+          <label class="text-[11px] text-slate-400 block mb-1">نص الإعلان السفلي:</label>
+          <input type="text" id="bottomAdInput" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2.5 rounded-lg mb-3 focus:outline-none focus:border-blue-500">
+          <button onclick="saveAds()" class="bg-blue-600 text-xs px-4 py-2 rounded-lg font-bold hover:bg-blue-500 transition">حفظ الإعلانات</button>
+        </div>
+
+        <!-- 2. تعديل العداد التنازلي -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80">
+          <h4 class="font-bold text-xs text-blue-400 mb-2.5">⏳ تعديل العدادات التنازلية</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">تاريخ ووقت الفتح:</label>
+              <input type="datetime-local" id="openTimeInput" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1">تاريخ ووقت الإغلاق:</label>
+              <input type="datetime-local" id="closeTimeInput" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+          </div>
+          <button onclick="saveTimers()" class="bg-blue-600 text-xs px-4 py-2 rounded-lg font-bold hover:bg-blue-500 transition">حفظ المواعيد</button>
+        </div>
+
+        <!-- 3. إضافة مرشح جديد -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80">
+          <h4 class="font-bold text-xs text-blue-400 mb-2.5">➕ إضافة مرشح جديد</h4>
+          <div class="space-y-2 mb-3">
+            <input type="text" id="candName" placeholder="اسم المرشح" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-blue-500">
+            <input type="text" id="candRole" placeholder="الرتبة (مثال: Admin / قائد شرطة)" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-blue-500">
+            <input type="text" id="candImg" placeholder="رابط صورة المرشح (URL)" class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-blue-500">
+            <textarea id="candBio" placeholder="البرنامج الانتخابي..." class="w-full bg-slate-800 border border-slate-700 text-xs text-white p-2 rounded-lg h-16 focus:outline-none focus:border-blue-500"></textarea>
+          </div>
+          <button onclick="addCandidate()" class="bg-emerald-600 text-xs px-4 py-2 rounded-lg font-bold hover:bg-emerald-500 transition">إضافة المرشح</button>
+        </div>
+
+        <!-- 4. إدارة المرشحين الحاليين -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80">
+          <h4 class="font-bold text-xs text-rose-400 mb-2.5">🗑️ حذف مرشح</h4>
+          <div id="adminCandidatesList" class="space-y-2"></div>
+        </div>
+
+      </div>
+
+      <!-- توقيع سفلي -->
+      <div class="mt-6 pt-3 border-t border-slate-700/50 text-center flex justify-between items-center">
+        <span class="signature-font text-xs text-slate-500">Design & Code By: <strong class="text-blue-400 font-semibold">Dark Wilz</strong></span>
+        <button onclick="closeAdminModal()" class="text-xs text-slate-400 hover:text-white underline">إغلاق النافذة</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- الإعلان والتوقيع السفلي الرئيسي -->
+  <footer class="bg-slate-900/90 border-t border-slate-800/80 py-4 px-4 text-center">
+    <div id="bottom-ad-display" class="text-xs text-slate-400 mb-1">
+      ⚡ جميع الحقوق محفوظة لسيرفر Wolf City ERLC © 2026
+    </div>
+    <div class="signature-font text-[11px] text-slate-500 font-medium">
+      Created By: <span class="text-blue-400 font-bold hover:text-blue-300 transition">Dark Wilz</span>
+    </div>
+  </footer>
+
+  <script>
+    let siteData = JSON.parse(localStorage.getItem('wolfCityData')) || {
+      topAd: "📢 [إعلان]: انضموا لسيرفر الديسكورد الخاص بنا Wolf City ERLC!",
+      bottomAd: "⚡ جميع الحقوق محفوظة لسيرفر Wolf City ERLC © 2026",
+      openTime: "2026-10-01T18:00",
+      closeTime: "2026-10-10T23:59",
+      candidates: [
+        { id: 1, name: "خالد أحمد", role: "مرشح رتبة Admin", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", bio: "تطوير الفعاليات ومساعدة الأعضاء.", votes: 0 },
+        { id: 2, name: "محمد سالم", role: "مرشح قائد شرطة", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80", bio: "إعادة هيكلة قطاع الشرطة وتحديث الدوريات.", votes: 0 }
+      ]
+    };
+
+    function saveData() {
+      localStorage.setItem('wolfCityData', JSON.stringify(siteData));
+      renderSite();
+    }
+
+    function renderSite() {
+      document.getElementById('top-ad-display').innerText = siteData.topAd;
+      document.getElementById('bottom-ad-display').innerText = siteData.bottomAd;
+
+      const hasVoted = localStorage.getItem('hasVoted') === 'true';
+      const userStatusBox = document.getElementById('user-vote-status');
+      
+      if (hasVoted) {
+        userStatusBox.classList.remove('hidden');
+      } else {
+        userStatusBox.classList.add('hidden');
+      }
+
+      const container = document.getElementById('candidates-grid');
+      container.innerHTML = '';
+      siteData.candidates.forEach(c => {
+        container.innerHTML += `
+          <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-6 flex flex-col justify-between shadow-lg backdrop-blur-md card-hover relative group">
+            <div>
+              <div class="relative w-20 h-20 mx-auto mb-4">
+                <img src="${c.img}" alt="${c.name}" class="w-full h-full rounded-2xl object-cover border-2 border-blue-500/80 shadow-md group-hover:border-blue-400 transition">
+              </div>
+              <h3 class="text-lg font-bold text-center text-white mb-1">${c.name}</h3>
+              <span class="block text-center text-xs text-blue-400 bg-blue-500/10 py-1 px-3 rounded-full w-max mx-auto mb-4 font-semibold border border-blue-500/20">${c.role}</span>
+              <p class="text-slate-300 text-xs leading-relaxed text-center mb-6">${c.bio}</p>
+            </div>
+            <button onclick="vote(${c.id})" ${hasVoted ? 'disabled' : ''} class="w-full py-2.5 ${hasVoted ? 'bg-slate-700/60 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white active:scale-95 shadow-lg shadow-blue-600/20'} font-bold rounded-xl transition duration-200 text-xs md:text-sm">
+              ${hasVoted ? 'تم التصويت 🔒' : `تصويت 🗳️ (${c.votes})`}
+            </button>
+          </div>
+        `;
+      });
+
+      const adminList = document.getElementById('adminCandidatesList');
+      if (adminList) {
+        adminList.innerHTML = '';
+        siteData.candidates.forEach(c => {
+          adminList.innerHTML += `
+            <div class="flex justify-between items-center bg-slate-800 p-2.5 rounded-lg text-xs border border-slate-700/50">
+              <span class="text-slate-200 font-medium">${c.name} <span class="text-slate-400">(${c.role})</span> - أصوات: <strong class="text-blue-400">${c.votes}</strong></span>
+              <button onclick="deleteCandidate(${c.id})" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded-md transition font-semibold">حذف</button>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function vote(id) {
+      if (localStorage.getItem('hasVoted') === 'true') {
+        return alert("⚠️ لقد قمت بالتصويت بالفعل ولا يمكنك التصويت أكثر من مرة!");
+      }
+
+      const candidate = siteData.candidates.find(c => c.id === id);
+      if (candidate) {
+        candidate.votes++;
+        localStorage.setItem('hasVoted', 'true');
+        saveData();
+        alert(`✅ تم تسجيل صوتك لـ ${candidate.name} بنجاح!`);
+      }
+    }
+
+    function resetAllVotes() {
+      if (confirm("هل أنت تأكد من تصفير جميع الأصوات وإعادة السماح للجميع بالتصويت؟")) {
+        siteData.candidates.forEach(c => c.votes = 0);
+        localStorage.removeItem('hasVoted');
+        saveData();
+        alert("✅ تم تصفير جميع الأصوات، ويمكن للجميع التصويت الآن من جديد!");
+      }
+    }
+
+    function updateTimers() {
+      const now = new Date().getTime();
+      const openDate = new Date(siteData.openTime).getTime();
+      const closeDate = new Date(siteData.closeTime).getTime();
+
+      const openDiff = openDate - now;
+      document.getElementById('open-timer').innerText = openDiff > 0 ? formatTime(openDiff) : "تم الافتتاح 🟢";
+
+      const closeDiff = closeDate - now;
+      document.getElementById('close-timer').innerText = closeDiff > 0 ? formatTime(closeDiff) : "تم الإغلاق 🔴";
+    }
+
+    function formatTime(ms) {
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+      return `${days}د : ${hours}س : ${minutes}ق : ${seconds}ث`;
+    }
+
+    setInterval(updateTimers, 1000);
+
+    function openAdminModal() { document.getElementById('adminModal').classList.remove('hidden'); }
+    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+    function checkAdminPassword() {
+      if (document.getElementById('adminPassword').value === "Wolfcityontop1") {
+        document.getElementById('adminLoginSection').classList.add('hidden');
+        document.getElementById('adminControlSection').classList.remove('hidden');
+        
+        document.getElementById('topAdInput').value = siteData.topAd;
+        document.getElementById('bottomAdInput').value = siteData.bottomAd;
+        document.getElementById('openTimeInput').value = siteData.openTime;
+        document.getElementById('closeTimeInput').value = siteData.closeTime;
+        renderSite();
+      } else {
+        alert("❌ كلمة المرور غير صحيحة!");
+      }
+    }
+
+    function saveAds() {
+      siteData.topAd = document.getElementById('topAdInput').value;
+      siteData.bottomAd = document.getElementById('bottomAdInput').value;
+      saveData();
+      alert("✅ تم حفظ الإعلانات!");
+    }
+
+    function saveTimers() {
+      siteData.openTime = document.getElementById('openTimeInput').value;
+      siteData.closeTime = document.getElementById('closeTimeInput').value;
+      saveData();
+      alert("✅ تم حفظ المواعيد الجديدة!");
+    }
+
+    function addCandidate() {
+      const name = document.getElementById('candName').value;
+      const role = document.getElementById('candRole').value;
+      const img = document.getElementById('candImg').value || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80";
+      const bio = document.getElementById('candBio').value;
+
+      if (!name || !role) return alert("يرجى كتابة الاسم والرتبة على الأقل!");
+
+      siteData.candidates.push({ id: Date.now(), name, role, img, bio, votes: 0 });
+      saveData();
+      alert("✅ تم إضافة المرشح!");
+    }
+
+    function deleteCandidate(id) {
+      siteData.candidates = siteData.candidates.filter(c => c.id !== id);
+      saveData();
+    }
+
+    renderSite();
+    updateTimers();
+  </script>
+</body>
+</html>
