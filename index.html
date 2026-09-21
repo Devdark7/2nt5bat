@@ -6,6 +6,11 @@
   <title>Wolf City ERLC | انتخابات السيرفر</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <style> 
     body { font-family: 'Cairo', sans-serif; }
     .signature-font { font-family: 'Poppins', sans-serif; }
@@ -72,7 +77,7 @@
 
   <!-- الإعلان العلوي -->
   <div id="top-ad-display" class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white text-xs md:text-sm py-2.5 px-4 text-center font-semibold shadow-md border-b border-blue-500/30">
-    📢 [إعلان]: انضموا لسيرفر الديسكورد الخاص بنا Wolf City ERLC!
+    📢 [إعلان]: جاري تحميل البيانات...
   </div>
 
   <!-- Header -->
@@ -135,7 +140,7 @@
       </div>
 
       <div id="candidates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- يتم عرض المرشحين هنا ديناميكياً -->
+        <p class="text-center text-slate-400 col-span-full">جاري تحميل المرشحين من قاعدة البيانات...</p>
       </div>
     </section>
   </main>
@@ -244,7 +249,16 @@
   </footer>
 
   <script>
-    let siteData = JSON.parse(localStorage.getItem('wolfCityData')) || {
+    // Firebase Configuration
+    const firebaseConfig = {
+      databaseURL: "https://wolfcity-bb46f-default-rtdb.firebaseio.com/"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let siteData = {
       topAd: "📢 [إعلان]: انضموا لسيرفر الديسكورد الخاص بنا Wolf City ERLC!",
       bottomAd: "⚡ جميع الحقوق محفوظة لسيرفر Wolf City ERLC © 2026",
       openTime: "2026-10-01T18:00",
@@ -255,14 +269,25 @@
       ]
     };
 
-    function saveData() {
-      localStorage.setItem('wolfCityData', JSON.stringify(siteData));
+    // Realtime Listener
+    db.ref('wolfCityData').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        siteData = data;
+        if (!siteData.candidates) siteData.candidates = [];
+      } else {
+        saveData(); // Save default data if empty
+      }
       renderSite();
+    });
+
+    function saveData() {
+      db.ref('wolfCityData').set(siteData);
     }
 
     function renderSite() {
-      document.getElementById('top-ad-display').innerText = siteData.topAd;
-      document.getElementById('bottom-ad-display').innerText = siteData.bottomAd;
+      document.getElementById('top-ad-display').innerText = siteData.topAd || '';
+      document.getElementById('bottom-ad-display').innerText = siteData.bottomAd || '';
 
       const hasVoted = localStorage.getItem('hasVoted') === 'true';
       const userStatusBox = document.getElementById('user-vote-status');
@@ -275,35 +300,42 @@
 
       const container = document.getElementById('candidates-grid');
       container.innerHTML = '';
-      siteData.candidates.forEach(c => {
-        container.innerHTML += `
-          <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-6 flex flex-col justify-between shadow-lg backdrop-blur-md card-hover relative group">
-            <div>
-              <div class="relative w-20 h-20 mx-auto mb-4">
-                <img src="${c.img}" alt="${c.name}" class="w-full h-full rounded-2xl object-cover border-2 border-blue-500/80 shadow-md group-hover:border-blue-400 transition">
+      
+      if (!siteData.candidates || siteData.candidates.length === 0) {
+        container.innerHTML = '<p class="text-center text-slate-400 col-span-full">لا يوجد مرشحون متاحون حالياً.</p>';
+      } else {
+        siteData.candidates.forEach(c => {
+          container.innerHTML += `
+            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-6 flex flex-col justify-between shadow-lg backdrop-blur-md card-hover relative group">
+              <div>
+                <div class="relative w-20 h-20 mx-auto mb-4">
+                  <img src="${c.img}" alt="${c.name}" class="w-full h-full rounded-2xl object-cover border-2 border-blue-500/80 shadow-md group-hover:border-blue-400 transition">
+                </div>
+                <h3 class="text-lg font-bold text-center text-white mb-1">${c.name}</h3>
+                <span class="block text-center text-xs text-blue-400 bg-blue-500/10 py-1 px-3 rounded-full w-max mx-auto mb-4 font-semibold border border-blue-500/20">${c.role}</span>
+                <p class="text-slate-300 text-xs leading-relaxed text-center mb-6">${c.bio || ''}</p>
               </div>
-              <h3 class="text-lg font-bold text-center text-white mb-1">${c.name}</h3>
-              <span class="block text-center text-xs text-blue-400 bg-blue-500/10 py-1 px-3 rounded-full w-max mx-auto mb-4 font-semibold border border-blue-500/20">${c.role}</span>
-              <p class="text-slate-300 text-xs leading-relaxed text-center mb-6">${c.bio}</p>
+              <button onclick="vote(${c.id})" ${hasVoted ? 'disabled' : ''} class="w-full py-2.5 ${hasVoted ? 'bg-slate-700/60 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white active:scale-95 shadow-lg shadow-blue-600/20'} font-bold rounded-xl transition duration-200 text-xs md:text-sm">
+                ${hasVoted ? 'تم التصويت 🔒' : `تصويت 🗳️ (${c.votes || 0})`}
+              </button>
             </div>
-            <button onclick="vote(${c.id})" ${hasVoted ? 'disabled' : ''} class="w-full py-2.5 ${hasVoted ? 'bg-slate-700/60 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white active:scale-95 shadow-lg shadow-blue-600/20'} font-bold rounded-xl transition duration-200 text-xs md:text-sm">
-              ${hasVoted ? 'تم التصويت 🔒' : `تصويت 🗳️ (${c.votes})`}
-            </button>
-          </div>
-        `;
-      });
+          `;
+        });
+      }
 
       const adminList = document.getElementById('adminCandidatesList');
       if (adminList) {
         adminList.innerHTML = '';
-        siteData.candidates.forEach(c => {
-          adminList.innerHTML += `
-            <div class="flex justify-between items-center bg-slate-800 p-2.5 rounded-lg text-xs border border-slate-700/50">
-              <span class="text-slate-200 font-medium">${c.name} <span class="text-slate-400">(${c.role})</span> - أصوات: <strong class="text-blue-400">${c.votes}</strong></span>
-              <button onclick="deleteCandidate(${c.id})" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded-md transition font-semibold">حذف</button>
-            </div>
-          `;
-        });
+        if (siteData.candidates) {
+          siteData.candidates.forEach(c => {
+            adminList.innerHTML += `
+              <div class="flex justify-between items-center bg-slate-800 p-2.5 rounded-lg text-xs border border-slate-700/50">
+                <span class="text-slate-200 font-medium">${c.name} <span class="text-slate-400">(${c.role})</span> - أصوات: <strong class="text-blue-400">${c.votes || 0}</strong></span>
+                <button onclick="deleteCandidate(${c.id})" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded-md transition font-semibold">حذف</button>
+              </div>
+            `;
+          });
+        }
       }
     }
 
@@ -314,7 +346,7 @@
 
       const candidate = siteData.candidates.find(c => c.id === id);
       if (candidate) {
-        candidate.votes++;
+        candidate.votes = (candidate.votes || 0) + 1;
         localStorage.setItem('hasVoted', 'true');
         saveData();
         alert(`✅ تم تسجيل صوتك لـ ${candidate.name} بنجاح!`);
@@ -323,7 +355,9 @@
 
     function resetAllVotes() {
       if (confirm("هل أنت تأكد من تصفير جميع الأصوات وإعادة السماح للجميع بالتصويت؟")) {
-        siteData.candidates.forEach(c => c.votes = 0);
+        if (siteData.candidates) {
+          siteData.candidates.forEach(c => c.votes = 0);
+        }
         localStorage.removeItem('hasVoted');
         saveData();
         alert("✅ تم تصفير جميع الأصوات، ويمكن للجميع التصويت الآن من جديد!");
@@ -336,10 +370,12 @@
       const closeDate = new Date(siteData.closeTime).getTime();
 
       const openDiff = openDate - now;
-      document.getElementById('open-timer').innerText = openDiff > 0 ? formatTime(openDiff) : "تم الافتتاح 🟢";
+      const openElem = document.getElementById('open-timer');
+      if (openElem) openElem.innerText = openDiff > 0 ? formatTime(openDiff) : "تم الافتتاح 🟢";
 
       const closeDiff = closeDate - now;
-      document.getElementById('close-timer').innerText = closeDiff > 0 ? formatTime(closeDiff) : "تم الإغلاق 🔴";
+      const closeElem = document.getElementById('close-timer');
+      if (closeElem) closeElem.innerText = closeDiff > 0 ? formatTime(closeDiff) : "تم الإغلاق 🔴";
     }
 
     function formatTime(ms) {
@@ -360,10 +396,10 @@
         document.getElementById('adminLoginSection').classList.add('hidden');
         document.getElementById('adminControlSection').classList.remove('hidden');
         
-        document.getElementById('topAdInput').value = siteData.topAd;
-        document.getElementById('bottomAdInput').value = siteData.bottomAd;
-        document.getElementById('openTimeInput').value = siteData.openTime;
-        document.getElementById('closeTimeInput').value = siteData.closeTime;
+        document.getElementById('topAdInput').value = siteData.topAd || '';
+        document.getElementById('bottomAdInput').value = siteData.bottomAd || '';
+        document.getElementById('openTimeInput').value = siteData.openTime || '';
+        document.getElementById('closeTimeInput').value = siteData.closeTime || '';
         renderSite();
       } else {
         alert("❌ كلمة المرور غير صحيحة!");
@@ -392,8 +428,15 @@
 
       if (!name || !role) return alert("يرجى كتابة الاسم والرتبة على الأقل!");
 
+      if (!siteData.candidates) siteData.candidates = [];
       siteData.candidates.push({ id: Date.now(), name, role, img, bio, votes: 0 });
       saveData();
+      
+      document.getElementById('candName').value = '';
+      document.getElementById('candRole').value = '';
+      document.getElementById('candImg').value = '';
+      document.getElementById('candBio').value = '';
+      
       alert("✅ تم إضافة المرشح!");
     }
 
@@ -402,7 +445,6 @@
       saveData();
     }
 
-    renderSite();
     updateTimers();
   </script>
 </body>
